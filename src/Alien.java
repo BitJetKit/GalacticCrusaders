@@ -15,8 +15,7 @@ public class Alien {
 	
 	boolean isDead;
 	boolean isLeft;
-	boolean isShoot; 
-	boolean isCollision;
+	boolean isShoot;
 	
 	public Alien() {
 		body = new Rectangle (0, 50, 25, 25);
@@ -44,11 +43,12 @@ public class Alien {
 	
 	public void draw (Graphics2D g) {
 		g.setColor(Color.GREEN);
-		g.fill(body);
 		g.fill(bullet);
+		g.setColor(new Color (0, 100 + health * 50, 0));
+		g.fill(body);
 	}
 	
-	public void update() {
+	public void update (boolean isCollision) {
 		
 		if (isShoot) {
 			shoot();
@@ -70,9 +70,11 @@ public class Alien {
 		}
 		
 		if (bullet.y > Panel.screenHeight) {
-			bullet.y = (int)(body.getY());
-			bullet.x = (int)(body.getCenterX());
-			isShoot = false;
+			resetBullet();
+		}
+		
+		if (isCollision) {
+			resetBullet();
 		}
 		
 		if (counter == 1) {
@@ -84,6 +86,12 @@ public class Alien {
 	
 	public void shoot() {
 		bullet.y += bulletSpeed;
+	}
+	
+	public void resetBullet() {
+		bullet.y = (int)(body.getY());
+		bullet.x = (int)(body.getCenterX());
+		isShoot = false;
 	}
 	
 	public void moveAlien(int multiplier) {

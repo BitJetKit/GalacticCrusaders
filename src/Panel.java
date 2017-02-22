@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
 public class Panel extends JPanel implements KeyListener {
@@ -24,11 +26,13 @@ public class Panel extends JPanel implements KeyListener {
 	static int screenHeight = 720;
 	int frameRate = 100;
 	
-	int numOfAliens = 8;
+	int numOfAliens = 0;
 	int bulletFrequency = 50;
+	int lives = 3;
 	
 	int lvl = 0;
 	int score = 0;
+	int tempScore = score;
 
 	boolean isPause;
 	boolean isLeft, isRight;
@@ -42,18 +46,18 @@ public class Panel extends JPanel implements KeyListener {
 
 	public Panel() {
 		setPreferredSize(new Dimension(screenWidth, screenHeight));
-		setBackground(Color.BLACK);
+		setBackground(Color.BLACK);											//TODO Add sound
 		addKeyListener(this);
 		
 		imgY = 0;
 		try {
-			img = ImageIO.read(new File("Starfield.png"));
+			img = ImageIO.read(new File("Starfield.png"));		//TODO Fix choppy starfield movement
 			img2 = img;
 		} catch (IOException e) {
 			System.out.println(e);
 		}
 		
-		p1 = new Spaceship(4, 4, 1);
+		p1 = new Spaceship(4, 4, lives);		//TODO Create computer player
 		nextLevel();
 	}
 
@@ -67,14 +71,14 @@ public class Panel extends JPanel implements KeyListener {
 		for (Alien a : aliens) a.draw(g2);
 		
 		g.setColor(Color.LIGHT_GRAY);
-		g.setFont(new Font(font, Font.PLAIN, 16));
+		g.setFont(new Font(font, Font.PLAIN, 16));		//TODO Draw lives
 		g.drawString("Level: " + lvl, 10, 20);
 		g.drawString("" + score, 10, 40);
 		
 		if (isPause && !isGameEnd) {
 			Color background = new Color (0, 0, 0, 200);
 			g.setColor(background);
-			g.fillRect(0, 0, screenWidth, screenHeight);
+			g.fillRect(0, 0, screenWidth, screenHeight);	//TODO Display score and level
 			g.setColor(Color.BLUE);
 			drawCenteredString(g, "Press p to play", new Rectangle (0, 0, screenWidth, 3 * screenHeight / 4), new Font (font, Font.PLAIN, 28));
 		}
@@ -101,36 +105,56 @@ public class Panel extends JPanel implements KeyListener {
 					
 				p1.update(isCollision);
 				isCollision = false;
-				
-				for (Alien a : aliens) a.update();
-					
+
 				for (Alien a : aliens) {
-					if (p1.bullet.intersects(a.bullet)) {
+					if (a.bullet.intersects(p1.body) || a.bullet.intersects(p1.gunBody)) {
+						p1.health--;
+						lives--;
+						score -= 50;
 						isCollision = true;
-						a.isShoot   = false;
+						if (p1.health == 0) {
+							isGameEnd = true;
+							break;
+						}
 					}
+					
+					a.update(isCollision);
+					if ((int) (Math.random() * bulletFrequency) == 1) {
+						a.isShoot = true;
+					}
+					
+					if (p1.health == 0) {
+						isGameEnd = true;
+					}
+					
+					if (p1.bullet.intersects(a.bullet)) {		//TODO Fix collision bug
+						isCollision = true;
+						a.resetBullet();
+					}
+					
 					if (p1.bullet.intersects(a.body)) {
 						isCollision = true;
 						a.health--;
 					}
+					
 					if (a.health == 0) {
 						a.isDead = true;
 					}
 				}
 					
 				for (int i = 0; i < aliens.size(); i++) {
-					if (aliens.get(i).isDead) aliens.remove(i);
+					if (aliens.get(i).isDead) {
+						aliens.remove(i);
+						score += 100;
+					}
 				}
-					
-				score = (numOfAliens - aliens.size()) * 100;
-					
-				for (Alien a : aliens) {
-					if ((int) (Math.random() * bulletFrequency) == 1) {
-						a.isShoot = true;
-					}
-					if (a.bullet.intersects(p1.body) || a.bullet.intersects(p1.gunBody)) {
-						isGameEnd = true;
-					}
+				
+				tempScore = score;
+				
+				if (aliens.isEmpty()) {
+					tempScore = score;
+					reset();
+					nextLevel();
 				}
 					
 				if (isRight) p1.moveShip(1);
@@ -141,16 +165,24 @@ public class Panel extends JPanel implements KeyListener {
 		}
 	}
 	
-	public void nextLevel() {
+	public void nextLevel() {		//TODO Balance levels
+		//tempScore = score;
 		aliens.clear();
+		score = tempScore;
 		lvl++;
 		isPause = true;
-		if (lvl == 5) {
+		
+		if (lvl == 3) {
+			numOfAliens = 5;
+			for (int i = 0; i < numOfAliens; i++) {
+				aliens.add(new Alien(i * (25+20), 50, 8, 3, 2));
+			}
+		} else if (lvl == 5) {
 			numOfAliens = 5;
 			bulletFrequency = 40;
 			for (int i = 0; i < numOfAliens; i++) {
 				aliens.add(new Alien(i * (25), 50, 10, 4, 2));
-			}
+			} 
 		} else {
 			numOfAliens = lvl * 3;
 			for (int i = 0; i < numOfAliens; i++) {
@@ -160,6 +192,8 @@ public class Panel extends JPanel implements KeyListener {
 	}
 	
 	public void reset() {
+		lives = 3;
+		p1 = new Spaceship(4, 4, lives);
 		isGameEnd = false;
 		isPause = true;
 		aliens.clear();
@@ -212,7 +246,7 @@ public class Panel extends JPanel implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		if (e.getKeyChar() == ' ') p1.shoot();
+		if (e.getKeyChar() == ' ' || e.getKeyCode() == KeyEvent.VK_UP) p1.shoot();
 		
 		if (e.getKeyChar() == 'q') System.exit(1);
 		

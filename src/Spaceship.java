@@ -19,7 +19,7 @@ public class Spaceship {
 		bullet  = new Rectangle ((int)(gunBody.getCenterX()), (int)(gunBody.getY() - 2), 2, 10);
 		bulletSpeed = 2;
 		speed       = 2;
-		health = 1;
+		health = 3;
 	}
 	
 	public Spaceship (int bs, int s, int h) {
@@ -34,10 +34,9 @@ public class Spaceship {
 	public void draw (Graphics2D g) {
 		g.setColor(Color.WHITE);
 		g.fill(bullet);
-		g.setColor(Color.RED);
+		g.setColor(new Color (50 + health * 40, 0, 0));
 		g.fill(body);
 		g.fill(gunBody);
-		//g.drawRect(xPos, yPos, gunWidth, gunHeight);
 	}
 	
 	public void update (boolean isCollision) {
@@ -45,15 +44,15 @@ public class Spaceship {
 			bullet.y -= bulletSpeed;
 		}
 		
-		if (bullet.y < 0 || isCollision) {
+		if (bullet.y + bullet.height < 0 || isCollision) {
 			bullet.y = (int)(gunBody.getY() + 2);
 			bullet.x = (int)(gunBody.getCenterX());
 			isShoot = false;
 		}
 		
-		if (body.x <= 0) {
-			body.x = 0;
-			gunBody.x = (int)(body.getCenterX() - 6);
+		if (body.x <= 0) {		//TODO Fix player going offscreen
+			body.x = Math.max(body.x, 4);
+			gunBody.x = Math.max(gunBody.x, (int)(body.getCenterX() - 6));
 		}
 		
 		if (body.x + body.width >= Panel.screenWidth) {
