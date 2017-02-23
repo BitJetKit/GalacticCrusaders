@@ -16,6 +16,7 @@ public class Alien {
 	boolean isDead;
 	boolean isLeft;
 	boolean isShoot;
+	boolean isCollision;
 	
 	public Alien() {
 		body = new Rectangle (0, 50, 25, 25);
@@ -44,11 +45,11 @@ public class Alien {
 	public void draw (Graphics2D g) {
 		g.setColor(Color.GREEN);
 		g.fill(bullet);
-		g.setColor(new Color (0, 100 + health * 50, 0));
+		g.setColor(new Color (0, Math.min(100 + health * 50, 255), 0));
 		g.fill(body);
 	}
 	
-	public void update (boolean isCollision) {
+	public void update() {
 		
 		if (isShoot) {
 			shoot();
