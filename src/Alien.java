@@ -1,11 +1,18 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 
 public class Alien {
-
+	BufferedImage alienImg, alienShip;
+	
 	Rectangle body;
+	Rectangle shield;
 	Rectangle bullet;
 	int bulletSpeed;
 	int speed;
@@ -19,24 +26,42 @@ public class Alien {
 	boolean isCollision;
 	
 	public Alien() {
-		body = new Rectangle (0, 50, 25, 25);
-		bullet = new Rectangle ((int)(body.getCenterX()), (int)(body.getY()), 3, 10);
+		try {
+			alienImg = ImageIO.read(new File("Alien.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		body   = new Rectangle (0, 50, 25, 25);
+		shield = new Rectangle (body.x-2, body.y-2, 27, 27);
+		bullet = new Rectangle ((int)(body.getCenterX()-1), (int)(body.getY()), 3, 10);
 		bulletSpeed = 2;
 		speed = 1;
 		health = 1;
 	}
 
 	public Alien (int x, int y, int bs, int s, int he) {
-		body = new Rectangle (x, y, 25, 25);
-		bullet = new Rectangle ((int)(body.getCenterX()), (int)(body.getY()), 3, 10);
+		try {
+			alienImg = ImageIO.read(new File("Alien.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		body   = new Rectangle (x, y, 25, 25);
+		shield = new Rectangle (body.x-2, body.y-2, 27, 27);
+		bullet = new Rectangle ((int)(body.getCenterX()-1), (int)(body.getY()), 3, 10);
 		bulletSpeed = bs;
 		speed = s;
 		health = he;
 	}
 	
 	public Alien (int x, int y, int w, int h, int bs, int s, int he) {
-		body = new Rectangle(x, y, w, h);
-		bullet = new Rectangle ((int)(body.getCenterX()), (int)(body.getY()), 3, 10);
+		try {
+			alienImg = ImageIO.read(new File("Alien.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		body   = new Rectangle(x, y, w, h);
+		shield = new Rectangle (body.x-2, body.y-2, 27, 27);
+		bullet = new Rectangle ((int)(body.getCenterX()-1), (int)(body.getY()), 3, 10);
 		bulletSpeed = bs;
 		speed = s;
 		health = he;
@@ -45,8 +70,17 @@ public class Alien {
 	public void draw (Graphics2D g) {
 		g.setColor(Color.GREEN);
 		g.fill(bullet);
-		g.setColor(new Color (0, Math.min(100 + health * 50, 255), 0));
-		g.fill(body);
+		g.setColor(new Color (0, Math.min(255 - health * 30, 75), 0));
+		//g.fill(body);
+		if (health != 1) {
+			if (health == 2) {
+				g.setColor(new Color (179, 58, 58));
+			} else if (health == 3) {
+				g.setColor(new Color (228, 235, 23));
+			}
+			g.draw(shield);
+		}
+		g.drawImage(alienImg, body.x, body.y, body.width, body.height, null);
 	}
 	
 	public void update() {
@@ -81,6 +115,7 @@ public class Alien {
 		if (counter == 1) {
 			bullet.y += 30;
 			body.y   += 30;
+			shield.y += 30;
 			counter = 0;
 		}
 	}
@@ -97,6 +132,7 @@ public class Alien {
 	
 	public void moveAlien(int multiplier) {
 		body.x   += speed * multiplier;
+		shield.x += speed * multiplier;
 		if (isShoot == false) bullet.x += speed * multiplier;
 	}
 }

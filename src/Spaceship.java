@@ -26,7 +26,7 @@ public class Spaceship {
 	public Spaceship (int bs, int s, int h) {
 		body    = new Rectangle (Panel.screenWidth/2, Panel.screenHeight - 20, 50, 15);
 		gunBody = new Rectangle ((int)(body.getCenterX() - 6), body.y - (25 - body.height), 12, 25);
-		bullet  = new Rectangle ((int)(gunBody.getCenterX()), (int)(gunBody.getY() + 2), 2, 10);
+		bullet  = new Rectangle ((int)(gunBody.getCenterX() - 1), (int)(gunBody.getY() + 2), 2, 10);
 		bulletSpeed = bs;
 		speed       = s;
 		health = h;
@@ -47,7 +47,7 @@ public class Spaceship {
 		
 		if (bullet.y + bullet.height < 0 || isCollision) {
 			bullet.y = (int)(gunBody.getY() + 2);
-			bullet.x = (int)(gunBody.getCenterX());
+			bullet.x = (int)(gunBody.getCenterX() - 1);
 			isShoot = false;
 		}
 	}
