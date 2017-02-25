@@ -5,5 +5,6 @@ The game is similiar to Space Invaders, as you have to shoot aliens,
 but also has different gameplay and some added features.
 
 Thanks for playing
-~ Vish B-K
+
+~Vish B-K
 
