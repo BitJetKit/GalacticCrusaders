@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 
 public class Alien {
-	BufferedImage alienImg, alienShip;
+	static BufferedImage alienImg, alienShip;
 	
 	Rectangle body;
 	Rectangle shield;
@@ -70,7 +70,7 @@ public class Alien {
 	public void draw (Graphics2D g) {
 		g.setColor(Color.GREEN);
 		g.fill(bullet);
-		g.setColor(new Color (0, Math.min(255 - health * 30, 75), 0));
+		g.setColor(new Color (0, Math.max(255 - health * 30, 75), 0));
 		//g.fill(body);
 		if (health != 1) {
 			if (health == 2) {

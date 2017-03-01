@@ -57,7 +57,6 @@ public class Spaceship {
 	}
 	
 	public void moveShip (int multiplier) {
-		//if (body.x > 0 && body.x + body.getWidth() < Panel.screenWidth)
 		body.x    += speed * multiplier;
 		gunBody.x += speed * multiplier;
 		if (isShoot == false) bullet.x  += speed * multiplier;
