@@ -9,11 +9,12 @@ import javax.imageio.ImageIO;
 
 
 public class Alien {
-	BufferedImage alienImg, alienShip;
+	static BufferedImage alienImg, missile;
 	
 	Rectangle body;
 	Rectangle shield;
 	Rectangle bullet;
+	//Bullet bullet;
 	int bulletSpeed;
 	int speed;
 	int health;
@@ -32,9 +33,8 @@ public class Alien {
 			e.printStackTrace();
 		}
 		body   = new Rectangle (0, 50, 25, 25);
-		shield = new Rectangle (body.x-2, body.y-2, 27, 27);
-		bullet = new Rectangle ((int)(body.getCenterX()-1), (int)(body.getY()), 3, 10);
-		bulletSpeed = 2;
+		shield = new Rectangle (body.x-1, body.y-1, 27, 27);
+	//	bullet = new Bullet ((int)(body.getCenterX()-2), (int)(body.getCenterY()-6), 4, 10, 2);
 		speed = 1;
 		health = 1;
 	}
@@ -42,12 +42,14 @@ public class Alien {
 	public Alien (int x, int y, int bs, int s, int he) {
 		try {
 			alienImg = ImageIO.read(new File("Alien.png"));
+		//	missile  = ImageIO.read(new File("Missile.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		body   = new Rectangle (x, y, 25, 25);
-		shield = new Rectangle (body.x-2, body.y-2, 27, 27);
-		bullet = new Rectangle ((int)(body.getCenterX()-1), (int)(body.getY()), 3, 10);
+		shield = new Rectangle (body.x-1, body.y-1, 27, 27);
+		//bullet = new Bullet ((int)(body.getCenterX()-2), (int)(body.getCenterY()-6), 4, 10, bs);
+		bullet = new Rectangle ((int)(body.getCenterX()-2), (int)(body.getCenterY()-6), 4, 10);
 		bulletSpeed = bs;
 		speed = s;
 		health = he;
@@ -60,17 +62,19 @@ public class Alien {
 			e.printStackTrace();
 		}
 		body   = new Rectangle(x, y, w, h);
-		shield = new Rectangle (body.x-2, body.y-2, 27, 27);
-		bullet = new Rectangle ((int)(body.getCenterX()-1), (int)(body.getY()), 3, 10);
-		bulletSpeed = bs;
+		shield = new Rectangle (body.x-1, body.y-1, 27, 27);
+		//bullet = new Bullet ((int)(body.getCenterX()-2), (int)(body.getCenterY()-6), 4, 10, bs);
 		speed = s;
 		health = he;
 	}
 	
 	public void draw (Graphics2D g) {
+		//System.out.println(bullet.getWidth());
 		g.setColor(Color.GREEN);
+		//g.drawImage(missile, bullet.x, bullet.y, bullet.width + 20, bullet.height + 20, null);
 		g.fill(bullet);
-		g.setColor(new Color (0, Math.min(255 - health * 30, 75), 0));
+		//bullet.draw(g);
+		g.setColor(new Color (0, Math.max(255 - health * 30, 75), 0));
 		//g.fill(body);
 		if (health != 1) {
 			if (health == 2) {
@@ -90,25 +94,25 @@ public class Alien {
 		}
 		
 		if (!isLeft) {
-			moveAlien(1);
-			if (body.x >= Panel.screenWidth - body.width) {
+			move(1);
+			if (shield.x + shield.width >= Panel.screenWidth) {
 				isLeft = true;
+				body.x   = (Panel.screenWidth - (body.x - shield.x)) - body.width;
+				shield.x = Panel.screenWidth - shield.width;
 			}
 		}
 		
 		if (isLeft) {
-			moveAlien(-1);
-			if (body.x <= 0) {
+			move(-1);
+			if (shield.x <= 0) {
 				counter++;
 				isLeft = false;
+				body.x   = body.x - shield.x;
+				shield.x = 0;
 			}
 		}
 		
-		if (bullet.y > Panel.screenHeight) {
-			resetBullet();
-		}
-		
-		if (isCollision) {
+		if (bullet.getY() > Panel.screenHeight || isCollision) {
 			resetBullet();
 		}
 		
@@ -122,15 +126,17 @@ public class Alien {
 	
 	public void shoot() {
 		bullet.y += bulletSpeed;
+		//bullet.fire();
 	}
 	
 	public void resetBullet() {
-		bullet.y = (int)(body.getY());
-		bullet.x = (int)(body.getCenterX());
+		bullet.x = (int)(body.getCenterX()-2);
+		bullet.y = (int)(body.getCenterY()-6);
+		//bullet = new Bullet ((int)(body.getCenterX()-2), (int)(body.getCenterY()-6), 4, 10, 8);
 		isShoot = false;
 	}
 	
-	public void moveAlien(int multiplier) {
+	public void move(int multiplier) {
 		body.x   += speed * multiplier;
 		shield.x += speed * multiplier;
 		if (isShoot == false) bullet.x += speed * multiplier;

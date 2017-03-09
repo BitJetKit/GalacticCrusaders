@@ -1,8 +1,15 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+@SuppressWarnings("unused")
 public class Spaceship {
+	static BufferedImage shipImg;
 	
 	Rectangle body;
 	Rectangle gunBody;
@@ -37,6 +44,7 @@ public class Spaceship {
 		g.fill(bullet);
 		g.setColor(new Color (Math.min(50 + health * 40, 255), 0, 0));
 		g.fill(body);
+		g.drawImage(shipImg, body.x, gunBody.y, body.width, gunBody.height, null);
 		g.fill(gunBody);
 	}
 	
@@ -56,8 +64,7 @@ public class Spaceship {
 		isShoot = true;
 	}
 	
-	public void moveShip (int multiplier) {
-		//if (body.x > 0 && body.x + body.getWidth() < Panel.screenWidth)
+	public void move (int multiplier) {
 		body.x    += speed * multiplier;
 		gunBody.x += speed * multiplier;
 		if (isShoot == false) bullet.x  += speed * multiplier;
